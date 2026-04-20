@@ -9,6 +9,7 @@
  * Copyright (c) Facebook, Inc. and its affiliates.
  */
 
+import { Analytics } from "@vercel/analytics/next"
 import {Fragment, useMemo} from 'react';
 import {useRouter} from 'next/router';
 import {Page} from 'components/Layout/Page';
@@ -48,14 +49,17 @@ export default function Layout({content, toc, meta, languages}) {
       break;
   }
   return (
-    <Page
-      toc={parsedToc}
-      routeTree={routeTree}
-      meta={meta}
-      section={section}
-      languages={languages}>
-      {parsedContent}
-    </Page>
+    <>
+      <Page
+        toc={parsedToc}
+        routeTree={routeTree}
+        meta={meta}
+        section={section}
+        languages={languages}>
+        {parsedContent}
+      </Page>
+      <Analytics />
+    </>
   );
 }
 
@@ -89,7 +93,7 @@ function reviveNodeOnClient(parentPropertyName, val) {
     let props = val[3];
     if (Type === 'wrapper') {
       Type = Fragment;
-      props = {children: props.children};
+      props = { children: props.children };
     }
     if (Type in MDXComponents) {
       Type = MDXComponents[Type];
@@ -119,7 +123,7 @@ export async function getStaticProps(context) {
     mdx = fs.readFileSync(rootDir + path + '/index.md', 'utf8');
   }
 
-  const {toc, content, meta, languages} = await compileMDX(mdx, path, {});
+  const { toc, content, meta, languages } = await compileMDX(mdx, path, {});
   return {
     props: {
       toc,
@@ -132,8 +136,8 @@ export async function getStaticProps(context) {
 
 // Collect all MDX files for static generation.
 export async function getStaticPaths() {
-  const {promisify} = require('util');
-  const {resolve} = require('path');
+  const { promisify } = require('util');
+  const { resolve } = require('path');
   const fs = require('fs');
   const readdir = promisify(fs.readdir);
   const stat = promisify(fs.stat);
